@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}User Data Accesses - Insider Threat Detection{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="fw-bold"><i class="fas fa-database"></i> Data Access Attempts for {{ user.username }}</h1>
+            <p class="text-muted">{{ user.email }} ({{ user.role.upper() }})</p>
+        </div>
+    </div>
+    
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">File Access Log</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Access Type</th>
+                        <th>Size</th>
+                        <th>Destination</th>
+                        <th>Risk Level</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for access in accesses %}
+                    <tr>
+                        <td>{{ access.file_name }}</td>
+                        <td><span class="badge bg-secondary">{{ access.access_type.replace('_', ' ').title() }}</span></td>
+                        <td>{{ access.file_size }}KB</td>
+                        <td>{{ access.destination or 'Local' }}</td>
+                        <td>
+                            <span class="badge {% if access.risk_level == 'critical' %}bg-danger{% elif access.risk_level == 'high' %}bg-warning{% else %}bg-info{% endif %}">
+                                {{ access.risk_level.upper() }}
+                            </span>
+                        </td>
+                        <td><small class="text-muted">{{ access.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</small></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">No file accesses found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

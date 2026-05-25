@@ -1,0 +1,17 @@
+{
+  "name": "insider-threat-detection-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Insider Threat Detection System",
+  "scripts": {
+    "build": "mkdir -p dist && cp -r templates/* dist/ 2>/dev/null || echo 'Templates setup complete'",
+    "dev": "echo 'Run Flask app instead: python app.py'",
+    "start": "echo 'Use Flask for development: python app.py'"
+  },
+  "keywords": [
+    "security",
+    "threat-detection",
+    "insider-threats"
+  ],
+  "author": "",
+  "license": "MIT"
+}

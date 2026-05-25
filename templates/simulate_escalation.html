@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Simulate Escalation - Insider Threat Detection{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="fw-bold mb-4"><i class="fas fa-flask"></i> Simulate Privilege Escalation</h1>
+            
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Create Escalation Test</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('escalation.simulate_escalation') }}">
+                        <div class="mb-3">
+                            <label for="escalation_type" class="form-label fw-bold">Escalation Type</label>
+                            <select class="form-control" id="escalation_type" name="escalation_type" required>
+                                <option value="">Select escalation type...</option>
+                                <option value="unauthorized_role_switch">Unauthorized Role Switch</option>
+                                <option value="admin_access_attempt">Admin Access Attempt</option>
+                                <option value="privilege_elevation">Privilege Elevation</option>
+                                <option value="sudo_command">Sudo Command Execution</option>
+                            </select>
+                            <small class="text-muted d-block mt-2">
+                                This will simulate an unauthorized attempt to escalate privileges
+                            </small>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> <strong>Note:</strong> This is a simulation for testing the detection system. The escalation attempt will be logged and blocked.
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-play"></i> Simulate Escalation
+                            </button>
+                            <a href="{{ url_for('escalation.index') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-question-circle"></i> About Privilege Escalation</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Privilege Escalation</strong> is when a user or application with limited privileges gains higher-level access than authorized.</p>
+                    <h6 class="mt-3">Common Escalation Methods:</h6>
+                    <ul>
+                        <li>Unauthorized role switching (e.g., user to admin)</li>
+                        <li>Accessing admin-only functions</li>
+                        <li>Exploiting unpatched vulnerabilities</li>
+                        <li>Misconfigurations in access control</li>
+                    </ul>
+                    <h6 class="mt-3">Prevention Measures:</h6>
+                    <ul>
+                        <li>Implement strict role-based access control (RBAC)</li>
+                        <li>Monitor privilege changes</li>
+                        <li>Regular security audits</li>
+                        <li>Keep systems patched and updated</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

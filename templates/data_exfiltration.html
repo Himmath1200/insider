@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Data Exfiltration - Insider Threat Detection{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="fw-bold"><i class="fas fa-database"></i> Data Access & Exfiltration</h1>
+                <a href="{{ url_for('exfiltration.simulate_exfiltration') }}" class="btn btn-warning">
+                    <i class="fas fa-flask"></i> Simulate Access
+                </a>
+            </div>
+            <p class="text-muted">Track and detect suspicious data access and exfiltration attempts</p>
+        </div>
+    </div>
+    
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="fw-bold">{{ stats.total_accesses }}</h3>
+                    <p class="text-muted">Total Accesses</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="fw-bold text-danger">{{ stats.suspicious_accesses }}</h3>
+                    <p class="text-muted">Suspicious</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="fw-bold text-warning">{{ stats.high_risk }}</h3>
+                    <p class="text-muted">High Risk</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="fw-bold text-dark">{{ stats.critical_risk }}</h3>
+                    <p class="text-muted">Critical Risk</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Data Access Log -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Data Access Log</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>File Name</th>
+                        <th>Access Type</th>
+                        <th>File Size</th>
+                        <th>Destination</th>
+                        <th>Risk Level</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs.items %}
+                    <tr>
+                        <td>
+                            <strong>{{ log.user.username if log.user else 'Unknown' }}</strong>
+                        </td>
+                        <td>{{ log.file_name }}</td>
+                        <td>
+                            <span class="badge bg-secondary">{{ log.access_type.replace('_', ' ').title() }}</span>
+                        </td>
+                        <td>{{ log.file_size }}KB</td>
+                        <td><small>{{ log.destination or 'Local' }}</small></td>
+                        <td>
+                            {% if log.risk_level == 'critical' %}
+                                <span class="badge bg-danger">CRITICAL</span>
+                            {% elif log.risk_level == 'high' %}
+                                <span class="badge bg-warning">HIGH</span>
+                            {% elif log.risk_level == 'medium' %}
+                                <span class="badge bg-info">MEDIUM</span>
+                            {% else %}
+                                <span class="badge bg-success">LOW</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <small class="text-muted">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            No data access logs found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if logs.pages > 1 %}
+        <div class="card-footer">
+            <nav aria-label="Page navigation">
+                <ul class="pagination mb-0">
+                    {% if logs.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('exfiltration.index', page=logs.prev_num) }}">Previous</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for page_num in logs.iter_pages() %}
+                        {% if page_num %}
+                            {% if page_num == logs.page %}
+                            <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                            {% else %}
+                            <li class="page-item"><a class="page-link" href="{{ url_for('exfiltration.index', page=page_num) }}">{{ page_num }}</a></li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if logs.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('exfiltration.index', page=logs.next_num) }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="mt-4">
+        <a href="{{ url_for('exfiltration.view_report') }}" class="btn btn-primary">
+            <i class="fas fa-chart-bar"></i> View Detailed Report
+        </a>
+        <a href="{{ url_for('exfiltration.suspicious_access') }}" class="btn btn-danger">
+            <i class="fas fa-exclamation-triangle"></i> View Suspicious Access
+        </a>
+    </div>
+</div>
+{% endblock %}

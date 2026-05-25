@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Access Control - Insider Threat Detection{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <h1 class="fw-bold mb-4"><i class="fas fa-lock"></i> Role-Based Access Control</h1>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">RBAC Implementation Guidelines</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for rec in recommendations %}
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex">
+                                <i class="fas fa-check-circle text-success me-3 mt-1"></i>
+                                <div>
+                                    <p class="mb-0">{{ rec }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Policy Details -->
+            {% for policy in policies %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">{{ policy.title }}</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Priority:</strong> <span class="badge bg-danger">{{ policy.priority.upper() }}</span></p>
+                    <p><strong>Description:</strong> {{ policy.description }}</p>
+                    <p><strong>Recommendation:</strong> {{ policy.recommendation }}</p>
+                </div>
+            </div>
+            {% endfor %}
+            
+            <!-- Principle of Least Privilege -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-shield-alt"></i> Principle of Least Privilege (PoLP)</h5>
+                </div>
+                <div class="card-body">
+                    <p>Users should only have the minimum access necessary to perform their job functions.</p>
+                    <h6 class="mt-3">Implementation Steps:</h6>
+                    <ol>
+                        <li>Define clear roles based on job functions</li>
+                        <li>Assign minimum required permissions to each role</li>
+                        <li>Conduct quarterly access reviews</li>
+                        <li>Remove unnecessary access immediately</li>
+                        <li>Use separation of duties where applicable</li>
+                        <li>Document access decisions and approvals</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

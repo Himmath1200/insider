@@ -1,0 +1,36 @@
+# Netlify Configuration for Frontend Deployment
+
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+# Environment variables for frontend
+[build.environment]
+  REACT_APP_API_URL = "https://your-railway-backend.railway.app"
+  NODE_VERSION = "18.0.0"
+
+# Redirects - route all requests to index.html for SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers for security and CORS
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Cache headers for assets
+[[headers]]
+  for = "/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"

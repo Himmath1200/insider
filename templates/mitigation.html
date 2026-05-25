@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Mitigation & Policies - Insider Threat Detection{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="fw-bold"><i class="fas fa-shield-alt"></i> Mitigation & Security Policies</h1>
+            <p class="text-muted">Comprehensive security recommendations and policy guidelines</p>
+        </div>
+    </div>
+    
+    <!-- Navigation -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light rounded">
+                <div class="container-fluid">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#policyNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="policyNav">
+                        <div class="navbar-nav w-100 justify-content-center gap-2">
+                            <a href="{{ url_for('mitigation.password_policy') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-key"></i> Password Policy
+                            </a>
+                            <a href="{{ url_for('mitigation.access_control') }}" class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-lock"></i> Access Control
+                            </a>
+                            <a href="{{ url_for('mitigation.login_restrictions') }}" class="btn btn-outline-warning btn-sm">
+                                <i class="fas fa-sign-in-alt"></i> Login Restrictions
+                            </a>
+                            <a href="{{ url_for('mitigation.monitoring_policy') }}" class="btn btn-outline-info btn-sm">
+                                <i class="fas fa-eye"></i> Monitoring
+                            </a>
+                            <a href="{{ url_for('mitigation.data_protection') }}" class="btn btn-outline-danger btn-sm">
+                                <i class="fas fa-database"></i> Data Protection
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    
+    <!-- Policy Cards -->
+    <div class="row">
+        {% for policy in policies %}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header {% if policy.priority == 'critical' %}bg-danger{% elif policy.priority == 'high' %}bg-warning{% elif policy.priority == 'medium' %}bg-info{% else %}bg-secondary{% endif %} text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">{{ policy.title }}</h5>
+                        <span class="badge bg-light text-dark">{{ policy.priority.upper() }}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ policy.description }}</p>
+                    <hr>
+                    <div>
+                        <small class="text-muted"><strong>Recommendation:</strong></small>
+                        <p class="small">{{ policy.recommendation }}</p>
+                    </div>
+                    {% if policy.admin_notes and current_user.role == 'admin' %}
+                    <div class="alert alert-light" role="alert">
+                        <strong>Admin Notes:</strong> {{ policy.admin_notes }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% if current_user.role == 'admin' %}
+                <div class="card-footer">
+                    <form method="POST" action="{{ url_for('mitigation.update_policy_notes', policy_id=policy.id) }}" class="d-flex gap-2">
+                        <input type="text" class="form-control form-control-sm" name="admin_notes" 
+                               placeholder="Add admin notes..." value="{{ policy.admin_notes or '' }}">
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="fas fa-save"></i> Save
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}Exfiltration Report - Insider Threat Detection{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="fw-bold"><i class="fas fa-chart-bar"></i> Data Exfiltration Report</h1>
+            <p class="text-muted">Detailed analysis of data access patterns and risk levels</p>
+        </div>
+    </div>
+    
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold">{{ stats.total_count }}</h4>
+                    <p class="text-muted mb-0">Total Accesses</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-danger">{{ stats.critical_count }}</h4>
+                    <p class="text-muted mb-0">Critical Risk</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-warning">{{ stats.high_count }}</h4>
+                    <p class="text-muted mb-0">High Risk</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-warning">{{ stats.suspicious_count }}</h4>
+                    <p class="text-muted mb-0">Suspicious</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="critical-tab" data-bs-toggle="tab" href="#critical-panel" role="tab">
+                <span class="badge bg-danger">CRITICAL ({{ stats.critical_count }})</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="high-tab" data-bs-toggle="tab" href="#high-panel" role="tab">
+                <span class="badge bg-warning">HIGH ({{ stats.high_count }})</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="medium-tab" data-bs-toggle="tab" href="#medium-panel" role="tab">
+                <span class="badge bg-info">MEDIUM ({{ stats.medium_count }})</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="low-tab" data-bs-toggle="tab" href="#low-panel" role="tab">
+                <span class="badge bg-success">LOW ({{ stats.low_count }})</span>
+            </a>
+        </li>
+    </ul>
+    
+    <!-- Tab Content -->
+    <div class="tab-content">
+        <!-- Critical -->
+        <div class="tab-pane fade show active" id="critical-panel" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-danger">
+                            <tr>
+                                <th>User</th>
+                                <th>File</th>
+                                <th>Access Type</th>
+                                <th>Size</th>
+                                <th>Destination</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in critical %}
+                            <tr>
+                                <td><strong>{{ log.user.username if log.user else 'Unknown' }}</strong></td>
+                                <td>{{ log.file_name }}</td>
+                                <td><span class="badge bg-secondary">{{ log.access_type }}</span></td>
+                                <td>{{ log.file_size }}KB</td>
+                                <td>{{ log.destination or 'Local' }}</td>
+                                <td><small class="text-muted">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</small></td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="6" class="text-center text-muted py-3">No critical risk accesses</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- High -->
+        <div class="tab-pane fade" id="high-panel" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-warning">
+                            <tr>
+                                <th>User</th>
+                                <th>File</th>
+                                <th>Access Type</th>
+                                <th>Size</th>
+                                <th>Destination</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in high %}
+                            <tr>
+                                <td><strong>{{ log.user.username if log.user else 'Unknown' }}</strong></td>
+                                <td>{{ log.file_name }}</td>
+                                <td><span class="badge bg-secondary">{{ log.access_type }}</span></td>
+                                <td>{{ log.file_size }}KB</td>
+                                <td>{{ log.destination or 'Local' }}</td>
+                                <td><small class="text-muted">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</small></td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="6" class="text-center text-muted py-3">No high risk accesses</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Medium -->
+        <div class="tab-pane fade" id="medium-panel" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-info">
+                            <tr>
+                                <th>User</th>
+                                <th>File</th>
+                                <th>Access Type</th>
+                                <th>Size</th>
+                                <th>Destination</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in medium %}
+                            <tr>
+                                <td><strong>{{ log.user.username if log.user else 'Unknown' }}</strong></td>
+                                <td>{{ log.file_name }}</td>
+                                <td><span class="badge bg-secondary">{{ log.access_type }}</span></td>
+                                <td>{{ log.file_size }}KB</td>
+                                <td>{{ log.destination or 'Local' }}</td>
+                                <td><small class="text-muted">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</small></td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="6" class="text-center text-muted py-3">No medium risk accesses</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Low -->
+        <div class="tab-pane fade" id="low-panel" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-success">
+                            <tr>
+                                <th>User</th>
+                                <th>File</th>
+                                <th>Access Type</th>
+                                <th>Size</th>
+                                <th>Destination</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in low %}
+                            <tr>
+                                <td><strong>{{ log.user.username if log.user else 'Unknown' }}</strong></td>
+                                <td>{{ log.file_name }}</td>
+                                <td><span class="badge bg-secondary">{{ log.access_type }}</span></td>
+                                <td>{{ log.file_size }}KB</td>
+                                <td>{{ log.destination or 'Local' }}</td>
+                                <td><small class="text-muted">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</small></td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="6" class="text-center text-muted py-3">No low risk accesses</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

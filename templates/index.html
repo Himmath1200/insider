@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Insider Threat Detection{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4 fw-bold"><i class="fas fa-chart-line"></i> Dashboard</h1>
+            <p class="text-muted">Welcome, <strong>{{ current_user.username }}</strong> ({{ current_user.role.upper() }})</p>
+        </div>
+    </div>
+    
+    <!-- Key Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card border-left-primary">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <small class="text-muted fw-bold">Total Users</small>
+                            <h3 class="mb-0">{{ stats.total_users }}</h3>
+                        </div>
+                        <i class="fas fa-users fa-3x text-primary opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card border-left-warning">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <small class="text-muted fw-bold">Open Alerts</small>
+                            <h3 class="mb-0">{{ stats.total_alerts }}</h3>
+                        </div>
+                        <i class="fas fa-bell fa-3x text-warning opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card border-left-danger">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <small class="text-muted fw-bold">Critical Alerts</small>
+                            <h3 class="mb-0">{{ stats.critical_alerts }}</h3>
+                        </div>
+                        <i class="fas fa-exclamation-circle fa-3x text-danger opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card border-left-success">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <small class="text-muted fw-bold">Escalations</small>
+                            <h3 class="mb-0">{{ stats.escalations }}</h3>
+                        </div>
+                        <i class="fas fa-arrow-up fa-3x text-success opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Activity Status Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="activityStatusChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Alert Severity Breakdown</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="severityChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Content Row -->
+    <div class="row">
+        <!-- Recent Activities -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-history"></i> Recent Activities</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Activity</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activity in recent_activities %}
+                            <tr>
+                                <td>
+                                    <strong>{{ activity.user.username if activity.user else 'Unknown' }}</strong>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ activity.activity_type }}</span>
+                                </td>
+                                <td>
+                                    <small class="text-muted">{{ activity.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+                                </td>
+                                <td>
+                                    {% if activity.status == 'suspicious' %}
+                                        <span class="badge bg-warning">Suspicious</span>
+                                    {% elif activity.status == 'critical' %}
+                                        <span class="badge bg-danger">Critical</span>
+                                    {% else %}
+                                        <span class="badge bg-success">Normal</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('logs.view_logs') }}" class="btn btn-sm btn-primary">
+                        View All Logs <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Open Alerts -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Open Alerts</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Alert Type</th>
+                                <th>Severity</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for alert in open_alerts %}
+                            <tr>
+                                <td>
+                                    <small><strong>{{ alert.title }}</strong></small>
+                                </td>
+                                <td>
+                                    {% if alert.severity == 'critical' %}
+                                        <span class="badge bg-danger">{{ alert.severity.upper() }}</span>
+                                    {% elif alert.severity == 'high' %}
+                                        <span class="badge bg-warning">{{ alert.severity.upper() }}</span>
+                                    {% elif alert.severity == 'medium' %}
+                                        <span class="badge bg-info">{{ alert.severity.upper() }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ alert.severity.upper() }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small class="text-muted">{{ alert.timestamp.strftime('%H:%M') }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark">{{ alert.status.upper() }}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('logs.suspicious_activity') }}" class="btn btn-sm btn-danger">
+                        View All Alerts <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Activity Status Chart
+    const activityCtx = document.getElementById('activityStatusChart').getContext('2d');
+    new Chart(activityCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Suspicious', 'Normal'],
+            datasets: [{
+                data: [{{ stats.suspicious_activities }}, {{ stats.normal_activities }}],
+                backgroundColor: ['#ff9999', '#66b3ff'],
+                borderColor: ['#fff', '#fff'],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+    
+    // Severity Chart
+    const severityCtx = document.getElementById('severityChart').getContext('2d');
+    new Chart(severityCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Critical', 'High', 'Medium', 'Low'],
+            datasets: [{
+                label: 'Number of Alerts',
+                data: [{{ stats.critical_alerts }}, 2, 1, 0],
+                backgroundColor: ['#dc3545', '#fd7e14', '#ffc107', '#28a745'],
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: { beginAtZero: true }
+            }
+        }
+    });
+});
+</script>
+
+<style>
+    .stat-card {
+        border-left: 4px solid;
+        border-radius: 10px;
+        transition: transform 0.2s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+    }
+    
+    .border-left-primary {
+        border-left-color: #007bff !important;
+    }
+    
+    .border-left-warning {
+        border-left-color: #ffc107 !important;
+    }
+    
+    .border-left-danger {
+        border-left-color: #dc3545 !important;
+    }
+    
+    .border-left-success {
+        border-left-color: #28a745 !important;
+    }
+</style>
+{% endblock %}

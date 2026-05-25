@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Login Restrictions - Insider Threat Detection{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <h1 class="fw-bold mb-4"><i class="fas fa-sign-in-alt"></i> Login Restrictions & Authentication</h1>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Authentication Security Measures</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for rec in recommendations %}
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex">
+                                <i class="fas fa-check-circle text-success me-3 mt-1"></i>
+                                <div>
+                                    <p class="mb-0">{{ rec }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Policy Details -->
+            {% for policy in policies %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">{{ policy.title }}</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Priority:</strong> <span class="badge bg-warning">{{ policy.priority.upper() }}</span></p>
+                    <p><strong>Description:</strong> {{ policy.description }}</p>
+                    <p><strong>Recommendation:</strong> {{ policy.recommendation }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

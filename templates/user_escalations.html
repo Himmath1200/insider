@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}User Escalations - Insider Threat Detection{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="fw-bold"><i class="fas fa-arrow-up"></i> Escalation Attempts for {{ user.username }}</h1>
+            <p class="text-muted">{{ user.email }} ({{ user.role.upper() }})</p>
+        </div>
+    </div>
+    
+    <div class="card shadow-sm">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">Privilege Escalation Attempts</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Escalation Type</th>
+                        <th>Current Role</th>
+                        <th>Attempted Role</th>
+                        <th>Severity</th>
+                        <th>Status</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for escalation in escalations %}
+                    <tr>
+                        <td>{{ escalation.escalation_type.replace('_', ' ').title() }}</td>
+                        <td>{{ escalation.current_role }}</td>
+                        <td>{{ escalation.attempted_role }}</td>
+                        <td>
+                            <span class="badge {% if escalation.severity == 'critical' %}bg-danger{% elif escalation.severity == 'high' %}bg-warning{% else %}bg-info{% endif %}">
+                                {{ escalation.severity.upper() }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge {% if escalation.status == 'blocked' %}bg-success{% else %}bg-warning{% endif %}">
+                                {{ escalation.status.upper() }}
+                            </span>
+                        </td>
+                        <td><small class="text-muted">{{ escalation.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</small></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">No escalation attempts found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Access Mapping - Insider Threat Detection{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="fw-bold"><i class="fas fa-lock"></i> Access Control Mapping</h1>
+            <p class="text-muted">View and manage role-based access control (RBAC)</p>
+        </div>
+    </div>
+    
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Access Matrix</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Module / Feature</th>
+                        <th class="text-center">
+                            <span class="badge bg-danger">Admin</span>
+                        </th>
+                        <th class="text-center">
+                            <span class="badge bg-secondary">User</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for feature in ['User Management', 'Log Analysis', 'System Settings', 'Report Generation', 'Data Access', 'Privilege Escalation', 'Dashboard Access'] %}
+                    <tr>
+                        <td><strong>{{ feature }}</strong></td>
+                        <td class="text-center">
+                            {% if feature in ['Dashboard Access', 'Log Analysis', 'Data Access', 'Report Generation'] or feature != 'User Management' and feature != 'System Settings' and feature != 'Privilege Escalation' %}
+                                <span class="badge bg-success"><i class="fas fa-check"></i> Allowed</span>
+                            {% else %}
+                                <span class="badge bg-success"><i class="fas fa-check"></i> Allowed</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if feature in ['Dashboard Access', 'Log Analysis', 'Data Access'] %}
+                                <span class="badge bg-success"><i class="fas fa-check"></i> Allowed</span>
+                            {% else %}
+                                <span class="badge bg-danger"><i class="fas fa-times"></i> Denied</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- User Access Summary -->
+    <div class="row mt-4">
+        {% for user in users %}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header {% if user.role == 'admin' %}bg-danger{% else %}bg-info{% endif %} text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-{{ 'crown' if user.role == 'admin' else 'user-circle' }}"></i>
+                        {{ user.username }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>Email:</strong> {{ user.email }}</p>
+                    <p class="mb-2"><strong>Department:</strong> {{ user.department or 'N/A' }}</p>
+                    <p class="mb-2"><strong>Role:</strong> <span class="badge {% if user.role == 'admin' %}bg-danger{% else %}bg-secondary{% endif %}">{{ user.role.upper() }}</span></p>
+                    <p class="mb-0"><strong>Status:</strong> <span class="badge {% if user.is_active %}bg-success{% else %}bg-secondary{% endif %}">{{ 'Active' if user.is_active else 'Inactive' }}</span></p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

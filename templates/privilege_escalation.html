@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Privilege Escalation - Insider Threat Detection{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="fw-bold"><i class="fas fa-arrow-up"></i> Privilege Escalation Detection</h1>
+                <a href="{{ url_for('escalation.simulate_escalation') }}" class="btn btn-warning">
+                    <i class="fas fa-flask"></i> Simulate Escalation
+                </a>
+            </div>
+            <p class="text-muted">Monitor unauthorized privilege escalation attempts</p>
+        </div>
+    </div>
+    
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="fw-bold text-danger">{{ stats.total }}</h3>
+                    <p class="text-muted">Total Attempts</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="fw-bold text-success">{{ stats.blocked }}</h3>
+                    <p class="text-muted">Blocked</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="fw-bold text-warning">{{ stats.critical }}</h3>
+                    <p class="text-muted">Critical</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="fw-bold">{{ stats.allowed }}</h3>
+                    <p class="text-muted">Allowed</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Escalations Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Escalation Attempts</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Escalation Type</th>
+                        <th>Current Role</th>
+                        <th>Attempted Role</th>
+                        <th>Severity</th>
+                        <th>Status</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for escalation in escalations.items %}
+                    <tr>
+                        <td>
+                            <strong>{{ escalation.user.username if escalation.user else 'Unknown' }}</strong>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">{{ escalation.escalation_type.replace('_', ' ').title() }}</span>
+                        </td>
+                        <td>{{ escalation.current_role or 'Unknown' }}</td>
+                        <td>{{ escalation.attempted_role or 'Unknown' }}</td>
+                        <td>
+                            {% if escalation.severity == 'critical' %}
+                                <span class="badge bg-danger">CRITICAL</span>
+                            {% elif escalation.severity == 'high' %}
+                                <span class="badge bg-warning">HIGH</span>
+                            {% elif escalation.severity == 'medium' %}
+                                <span class="badge bg-info">MEDIUM</span>
+                            {% else %}
+                                <span class="badge bg-secondary">LOW</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if escalation.status == 'blocked' %}
+                                <span class="badge bg-success">BLOCKED</span>
+                            {% elif escalation.status == 'allowed' %}
+                                <span class="badge bg-warning">ALLOWED</span>
+                            {% else %}
+                                <span class="badge bg-secondary">PENDING</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <small class="text-muted">{{ escalation.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            No escalation attempts found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if escalations.pages > 1 %}
+        <div class="card-footer">
+            <nav aria-label="Page navigation">
+                <ul class="pagination mb-0">
+                    {% if escalations.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('escalation.index', page=escalations.prev_num) }}">Previous</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for page_num in escalations.iter_pages() %}
+                        {% if page_num %}
+                            {% if page_num == escalations.page %}
+                            <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                            {% else %}
+                            <li class="page-item"><a class="page-link" href="{{ url_for('escalation.index', page=page_num) }}">{{ page_num }}</a></li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if escalations.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('escalation.index', page=escalations.next_num) }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="mt-4">
+        <a href="{{ url_for('escalation.view_report') }}" class="btn btn-primary">
+            <i class="fas fa-chart-bar"></i> View Escalation Report
+        </a>
+    </div>
+</div>
+{% endblock %}
