@@ -1,0 +1,51 @@
+# Netlify - files and directories to ignore
+
+# Python
+*.py
+*.pyc
+__pycache__/
+*.egg-info/
+.env
+.venv
+venv/
+
+# Flask
+instance/
+flask_session/
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (not needed for this project)
+node_modules/
+package-lock.json
+
+# Database
+*.db
+*.sqlite
+
+# Documentation
+*.md
+
+# Build artifacts
+build/
+dist/
+
+# Other
+.env.example
+Procfile
+runtime.txt
+requirements.txt
+setup-deployment.sh

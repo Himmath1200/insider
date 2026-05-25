@@ -1,19 +1,32 @@
 # Netlify Configuration for Frontend Deployment
 
 [build]
-  publish = "dist"
-  command = "npm run build"
+  publish = "templates"
+  command = "echo 'Static site - no build needed'"
 
 # Environment variables for frontend
 [build.environment]
-  REACT_APP_API_URL = "https://your-railway-backend.railway.app"
-  NODE_VERSION = "18.0.0"
+  NODE_ENV = "production"
 
-# Redirects - route all requests to index.html for SPA routing
+# Redirects - route all requests to login for SPA routing
 [[redirects]]
   from = "/*"
-  to = "/index.html"
+  to = "/login.html"
   status = 200
+  condition = "!req.headers.Accept || req.headers.Accept.includes('text/html')"
+
+# Exception: Don't redirect api calls or static assets
+[[redirects]]
+  from = "/api/*"
+  to = ":splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/static/*"
+  to = ":splat"
+  status = 200
+  force = true
 
 # Headers for security and CORS
 [[headers]]
