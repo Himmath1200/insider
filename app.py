@@ -220,12 +220,18 @@ if __name__ == '__main__':
             print("="*50)
             init_db(app)
     
-    # Run Flask development server
+    # Run Flask application
+    # Get port from environment variable (Railway, Heroku) or use default for development
+    port = int(os.getenv('PORT', 5000))
+    is_production = os.getenv('ENVIRONMENT') == 'production'
+    
     print("\n" + "="*50)
     print("Starting Insider Threat Detection System")
     print("="*50)
-    print("Open your browser and navigate to: http://localhost:5000")
-    print("Press CTRL+C to stop the server")
+    print(f"Server running on port {port}")
+    print(f"Environment: {'Production' if is_production else 'Development'}")
     print("="*50 + "\n")
     
-    app.run(debug=True, host='localhost', port=5000)
+    # Production: use 0.0.0.0 for all interfaces, development: use localhost
+    host = '0.0.0.0' if is_production else 'localhost'
+    app.run(debug=not is_production, host=host, port=port)
